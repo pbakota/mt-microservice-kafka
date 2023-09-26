@@ -1,3 +1,4 @@
+using CommonData.Configuration;
 using CommonData.Dto;
 using CommonData.Helpers;
 
@@ -12,14 +13,28 @@ using Orders.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var kafkaConfig = new KafkaConfiguration();
+var kafkaSection = builder.Configuration.GetSection("Kafka");
+
+// Bind to local instance
+kafkaSection.Bind(kafkaConfig);
+
+// Make it available for other services
+builder.Services.Configure<KafkaConfiguration>(kafkaSection);
+
+var bootstrapServers = kafkaConfig.BootstrapServers;
+
+var connectionString = builder.Configuration.GetConnectionString("sqlite")!;
+
 // Add services to the container.
 builder.Services.AddScoped<IOrdersService, OrderService>();
-builder.Services.AddSingleton(s => new ProducerBuilder<Null, OrderEvent>(new ProducerConfig { BootstrapServers = "playbox:9094" })
-    .SetValueSerializer(new KafkaEventSerializer<OrderEvent>()).Build());
+builder.Services.AddSingleton(s => new ProducerBuilder<Null, OrderEvent>(new ProducerConfig {
+    BootstrapServers = bootstrapServers
+}).SetValueSerializer(new KafkaEventSerializer<OrderEvent>()).Build());
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<OrderDbContext>(opt =>
-    opt.UseSqlite(connectionString: "Data Source=db/orders.db")
+    opt.UseSqlite(connectionString: connectionString)
 );
 
 builder.Services.AddMassTransit(x =>
@@ -31,9 +46,9 @@ builder.Services.AddMassTransit(x =>
 
         rider.UsingKafka((context, k) =>
         {
-            k.Host("playbox:9094");
+            k.Host(bootstrapServers);
 
-            k.TopicEndpoint<Null, OrderEvent>("csharp-reversed-orders", "csharp-orders-group", c =>
+            k.TopicEndpoint<Null, OrderEvent>(kafkaConfig.Consumers?["reversed-orders"].Topic, kafkaConfig.Consumers?["reversed-orders"].GroupId, c =>
             {
                 c.SetValueDeserializer(new KafkaEventSerializer<OrderEvent>());
                 c.AutoOffsetReset = AutoOffsetReset.Earliest;

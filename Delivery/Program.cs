@@ -1,3 +1,4 @@
+using CommonData.Configuration;
 using CommonData.Dto;
 using CommonData.Helpers;
 
@@ -12,13 +13,28 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var kafkaConfig = new KafkaConfiguration();
+var kafkaSection = builder.Configuration.GetSection("Kafka");
+
+// Bind to local instance
+kafkaSection.Bind(kafkaConfig);
+
+// Make it available for other services
+builder.Services.Configure<KafkaConfiguration>(kafkaSection);
+
+var bootstrapServers = kafkaConfig.BootstrapServers;
+
+var connectionString = builder.Configuration.GetConnectionString("sqlite")!;
+
 // Add services to the container.
 builder.Services.AddScoped<IDeliveryService, DeliveryService>();
-builder.Services.AddSingleton(s => new ProducerBuilder<Null, DeliveryEvent>(new ProducerConfig { BootstrapServers = "playbox:9094" })
-    .SetValueSerializer(new KafkaEventSerializer<DeliveryEvent>()).Build());
+builder.Services.AddSingleton(s => new ProducerBuilder<Null, DeliveryEvent>(new ProducerConfig
+{
+    BootstrapServers = bootstrapServers
+}).SetValueSerializer(new KafkaEventSerializer<DeliveryEvent>()).Build());
 
 builder.Services.AddDbContext<DeliveryDbContext>(opt =>
-    opt.UseSqlite(connectionString: "Data Source=db/deliveries.db")
+    opt.UseSqlite(connectionString: connectionString)
 );
 
 builder.Services.AddMassTransit(x =>
@@ -30,9 +46,9 @@ builder.Services.AddMassTransit(x =>
 
         rider.UsingKafka((context, k) =>
         {
-            k.Host("playbox:9094");
+            k.Host(bootstrapServers);
 
-            k.TopicEndpoint<Null, DeliveryEvent>("csharp-new-stock", "csharp-stock-group", c =>
+            k.TopicEndpoint<Null, DeliveryEvent>(kafkaConfig.Consumers?["new-stock"].Topic, kafkaConfig.Consumers?["new-stock"].GroupId, c =>
             {
                 c.SetValueDeserializer(new KafkaEventSerializer<DeliveryEvent>());
                 c.AutoOffsetReset = AutoOffsetReset.Earliest;

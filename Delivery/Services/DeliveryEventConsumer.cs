@@ -1,3 +1,4 @@
+using CommonData.Configuration;
 using CommonData.Dto;
 
 using Confluent.Kafka;
@@ -6,19 +7,24 @@ using Delivery.Models;
 
 using MassTransit;
 
+using Microsoft.Extensions.Options;
+
 namespace Delivery.Services;
 
 public class DeliveryEventConsumer : IConsumer<DeliveryEvent>
 {
-    private const string ReversedStockTopic = "csharp-reversed-stock";
     private readonly ILogger<DeliveryEventConsumer> _logger;
+    private readonly KafkaConfiguration _kafkaConfiguration;
     private readonly DeliveryDbContext _dbContext;
     private readonly IProducer<Null, DeliveryEvent> _deliveryEventProducer;
 
-    public DeliveryEventConsumer(ILogger<DeliveryEventConsumer> logger, DeliveryDbContext dbContext, 
+    public DeliveryEventConsumer(ILogger<DeliveryEventConsumer> logger,
+        IOptions<KafkaConfiguration> kafkaConfiguration,
+        DeliveryDbContext dbContext,
         IProducer<Null, DeliveryEvent> deliveryEventProducer)
     {
         _logger = logger;
+        _kafkaConfiguration = kafkaConfiguration.Value;
         _dbContext = dbContext;
         _deliveryEventProducer = deliveryEventProducer;
     }
@@ -65,8 +71,10 @@ public class DeliveryEventConsumer : IConsumer<DeliveryEvent>
                 Order = order,
             };
 
-            await _deliveryEventProducer.ProduceAsync(ReversedStockTopic, new Message<Null, DeliveryEvent> { Value = reverseEvent });
-            _logger.LogInformation("{} -> Event sent: {}", ReversedStockTopic, reverseEvent);
+            await _deliveryEventProducer.ProduceAsync(_kafkaConfiguration.Producers?["reversed-stock"].Topic,
+                new Message<Null, DeliveryEvent> { Value = reverseEvent });
+
+            _logger.LogInformation("{} -> Event sent: {}", _kafkaConfiguration.Producers?["reversed-stock"].Topic, reverseEvent);
         }
     }
 }

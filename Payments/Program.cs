@@ -1,3 +1,4 @@
+using CommonData.Configuration;
 using CommonData.Dto;
 using CommonData.Helpers;
 
@@ -12,17 +13,34 @@ using Payments.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddSingleton(s => new ProducerBuilder<Null, PaymentEvent>(new ProducerConfig { BootstrapServers = "playbox:9094" })
-    .SetValueSerializer(new KafkaEventSerializer<PaymentEvent>()).Build());
+var kafkaConfig = new KafkaConfiguration();
+var kafkaSection = builder.Configuration.GetSection("Kafka");
 
-builder.Services.AddSingleton(s => new ProducerBuilder<Null, OrderEvent>(new ProducerConfig { BootstrapServers = "playbox:9094" })
-    .SetValueSerializer(new KafkaEventSerializer<OrderEvent>()).Build());
+// Bind to local instance
+kafkaSection.Bind(kafkaConfig);
+
+// Make it available for other services
+builder.Services.Configure<KafkaConfiguration>(kafkaSection);
+
+var bootstrapServers = kafkaConfig.BootstrapServers;
+
+var connectionString = builder.Configuration.GetConnectionString("sqlite")!;
+
+// Add services to the container.
+builder.Services.AddSingleton(s => new ProducerBuilder<Null, PaymentEvent>(new ProducerConfig
+{
+    BootstrapServers = bootstrapServers,
+}).SetValueSerializer(new KafkaEventSerializer<PaymentEvent>()).Build());
+
+builder.Services.AddSingleton(s => new ProducerBuilder<Null, OrderEvent>(new ProducerConfig
+{
+    BootstrapServers = bootstrapServers,
+}).SetValueSerializer(new KafkaEventSerializer<OrderEvent>()).Build());
 
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<PaymentDbContext>(opt =>
-    opt.UseSqlite(connectionString: "Data Source=db/payments.db")
+    opt.UseSqlite(connectionString: connectionString)
 );
 
 builder.Services.AddMassTransit(x =>
@@ -35,9 +53,9 @@ builder.Services.AddMassTransit(x =>
 
         rider.UsingKafka((context, k) =>
         {
-            k.Host("playbox:9094");
+            k.Host(bootstrapServers);
 
-            k.TopicEndpoint<Null, PaymentEvent>("csharp-reversed-payments", "csharp-payments-group", c =>
+            k.TopicEndpoint<Null, PaymentEvent>(kafkaConfig.Consumers?["reversed-payments"].Topic, kafkaConfig.Consumers?["reversed-payments"].GroupId, c =>
             {
                 c.SetValueDeserializer(new KafkaEventSerializer<PaymentEvent>());
                 c.AutoOffsetReset = AutoOffsetReset.Earliest;
@@ -46,7 +64,7 @@ builder.Services.AddMassTransit(x =>
                 c.CreateIfMissing(m => m.NumPartitions = 2);
             });
 
-            k.TopicEndpoint<Null, OrderEvent>("csharp-new-orders", "csharp-orders-group", c =>
+            k.TopicEndpoint<Null, OrderEvent>(kafkaConfig.Consumers?["new-orders"].Topic, kafkaConfig.Consumers?["new-orders"].GroupId, c =>
             {
                 c.SetValueDeserializer(new KafkaEventSerializer<OrderEvent>());
                 c.AutoOffsetReset = AutoOffsetReset.Earliest;

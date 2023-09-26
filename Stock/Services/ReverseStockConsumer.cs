@@ -1,8 +1,11 @@
+using CommonData.Configuration;
 using CommonData.Dto;
 
 using Confluent.Kafka;
 
 using MassTransit;
+
+using Microsoft.Extensions.Options;
 
 using Stock.Models;
 
@@ -10,14 +13,18 @@ namespace Stock.Services;
 
 public class ReverseStockConsumer : IConsumer<DeliveryEvent>
 {
-    private const string ReversedPaymentsTopic = "csharp-reversed-payments";
     private readonly ILogger<ReverseStockConsumer> _logger;
+    private readonly KafkaConfiguration _kafkaConfiguration;
     private readonly StockDbContext _dbContext;
     private readonly IProducer<Null, PaymentEvent> _paymentEventProducer;
 
-    public ReverseStockConsumer(ILogger<ReverseStockConsumer> logger, StockDbContext dbContext, IProducer<Null, PaymentEvent> paymentEventProducer)
+    public ReverseStockConsumer(ILogger<ReverseStockConsumer> logger,
+        IOptions<KafkaConfiguration> kafkaConfiguration,
+        StockDbContext dbContext,
+        IProducer<Null, PaymentEvent> paymentEventProducer)
     {
         _logger = logger;
+        _kafkaConfiguration = kafkaConfiguration.Value;
         _dbContext = dbContext;
         _paymentEventProducer = paymentEventProducer;
     }
@@ -45,8 +52,10 @@ public class ReverseStockConsumer : IConsumer<DeliveryEvent>
                 Type = "PAYMENT_REVERSED",
             };
 
-            await _paymentEventProducer.ProduceAsync(ReversedPaymentsTopic, new Message<Null, PaymentEvent> { Value = paymentEvent });
-            _logger.LogInformation("{} -> Event sent: {}", ReversedPaymentsTopic, paymentEvent);
+            await _paymentEventProducer.ProduceAsync(_kafkaConfiguration.Producers?["reversed-payments"].Topic,
+                new Message<Null, PaymentEvent> { Value = paymentEvent });
+
+            _logger.LogInformation("{} -> Event sent: {}", _kafkaConfiguration.Producers?["reversed-payments"].Topic, paymentEvent);
         }
         catch (Exception e)
         {

@@ -1,6 +1,9 @@
+using CommonData.Configuration;
 using CommonData.Dto;
 
 using Confluent.Kafka;
+
+using Microsoft.Extensions.Options;
 
 using Orders.Models;
 
@@ -13,14 +16,18 @@ public interface IOrdersService
 
 public class OrderService : IOrdersService
 {
-    private const string NewOrdersTopic = "csharp-new-orders";
     private readonly ILogger<OrderService> _logger;
+    private readonly KafkaConfiguration _kafkaConfiguration;
     private readonly OrderDbContext _dbContext;
     private readonly IProducer<Null, OrderEvent> _orderEventProducer;
 
-    public OrderService(ILogger<OrderService> logger, OrderDbContext context, IProducer<Null, OrderEvent> orderEventProducer)
+    public OrderService(ILogger<OrderService> logger,
+        IOptions<KafkaConfiguration> kafkaConfiguration,
+        OrderDbContext context,
+        IProducer<Null, OrderEvent> orderEventProducer)
     {
         _logger = logger;
+        _kafkaConfiguration = kafkaConfiguration.Value;
         _dbContext = context;
         _orderEventProducer = orderEventProducer;
     }
@@ -48,10 +55,10 @@ public class OrderService : IOrdersService
                 Type = "ORDER_CREATED",
             };
 
-            await _orderEventProducer.ProduceAsync(NewOrdersTopic, 
+            await _orderEventProducer.ProduceAsync(_kafkaConfiguration.Producers?["new-orders"].Topic, 
                 new Message<Null, OrderEvent> { Value = orderEvent });
 
-            _logger.LogInformation("{} -> Event sent: {}", NewOrdersTopic, orderEvent);
+            _logger.LogInformation("{} -> Event sent: {}", _kafkaConfiguration.Producers?["new-orders"].Topic, orderEvent);
 
             return newOrder.Entity;
         }

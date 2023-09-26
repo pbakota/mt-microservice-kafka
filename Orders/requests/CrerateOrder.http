@@ -2,10 +2,10 @@ POST http://127.0.0.1:5000/orders
 Content-Type: application/json
 
 {
-    "Item": "Product 2",
+    "Item": "Product 1",
     "Quantity": 1,
     "Amount": 3,
     "PaymentMethod": "CreditCard",
-    "Address": ""
+    "Address": "address 1"
 }
 
