@@ -1,0 +1,32 @@
+### Create order
+POST http://127.0.0.1:5050/gateway/orders
+Content-Type: application/json
+
+{
+    "Item": "Product 1",
+    "Quantity": 1,
+    "Amount": 3,
+    "PaymentMethod": "CreditCard",
+    "Address": "address 1"
+}
+
+### Get last 5 order
+GET http://127.0.0.1:5050/gateway/orders?top=5
+
+### Get last 5 payment
+GET http://127.0.0.1:5050/gateway/payments?top=5
+
+### Add stock item
+POST http://127.0.0.1:5050/gateway/addItem
+Content-Type: application/json
+
+{
+    "Item": "Product 1",
+    "Quantity": 1
+}
+
+### Get stock item
+GET http://127.0.0.1:5050/gateway/getItem/Product%201
+
+### Get last 5 delivery
+GET http://127.0.0.1:5050/gateway/deliveries?top=5
