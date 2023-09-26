@@ -3,9 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-**/db/**.db
-**/db/**.db-shm
-**/db/**.db-wal
+**/db/*.db
+**/db/*.db-shm
+**/db/*.db-wal
 
 # User-specific files
 *.rsuser
