@@ -1,0 +1,7 @@
+POST http://127.0.0.1:5002/addItem
+Content-Type: application/json
+
+{
+    "Item": "Product 1",
+    "Quantity": 100
+}
