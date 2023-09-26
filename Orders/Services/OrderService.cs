@@ -1,8 +1,10 @@
 using CommonData.Configuration;
 using CommonData.Dto;
+using CommonData.Helpers;
 
 using Confluent.Kafka;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 using Orders.Models;
@@ -12,6 +14,7 @@ namespace Orders.Services;
 public interface IOrdersService
 {
     Task<Order> CreateOrderAsync(CustomerOrder customerOrder);
+    Task<List<Order>> GetOrdersAsync(Pagination pagination);
 }
 
 public class OrderService : IOrdersService
@@ -73,4 +76,7 @@ public class OrderService : IOrdersService
             throw;
         }
     }
+
+    public async Task<List<Order>> GetOrdersAsync(Pagination pagination)
+        => await _dbContext.Orders.OrderByDescending(x => x.Id).Skip(pagination.Skip).Take(pagination.Top).ToListAsync();
 }

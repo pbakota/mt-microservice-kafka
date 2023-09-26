@@ -1,0 +1,2 @@
+### Get last 5 deliveries
+GET http://127.0.0.1:5003/deliveries?top=5

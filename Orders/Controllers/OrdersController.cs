@@ -1,4 +1,5 @@
 using CommonData.Dto;
+using CommonData.Helpers;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,4 +27,8 @@ public class OrdersController : ControllerBase
         _logger.LogInformation("Received: {}", customerOrder);
         return Ok(await _service.CreateOrderAsync(customerOrder));
     }
+
+    [HttpGet]
+    public async Task<ActionResult<Order>> GetOrders([FromQuery] Pagination pagination)
+        => Ok(await _service.GetOrdersAsync(pagination));
 }

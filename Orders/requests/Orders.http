@@ -1,3 +1,4 @@
+### Create order
 POST http://127.0.0.1:5000/orders
 Content-Type: application/json
 
@@ -9,3 +10,5 @@ Content-Type: application/json
     "Address": "address 1"
 }
 
+### Get orders
+GET http://127.0.0.1:5000/orders?top=1

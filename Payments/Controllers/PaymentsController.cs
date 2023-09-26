@@ -1,3 +1,5 @@
+using CommonData.Helpers;
+
 using Microsoft.AspNetCore.Mvc;
 
 using Payments.Models;
@@ -8,17 +10,12 @@ namespace Orders.Controllers;
 [Route("/payments")]
 public class PaymentsController : ControllerBase
 {
-    private readonly ILogger<PaymentsController> _logger;
     private readonly PaymentDbContext _dbContext;
 
-    public PaymentsController(ILogger<PaymentsController> logger, PaymentDbContext dbContext)
-    {
-        _logger = logger;
-        _dbContext = dbContext;
-    }
+    public PaymentsController(PaymentDbContext dbContext)
+        => _dbContext = dbContext;
 
     [HttpGet]
-    public ActionResult<List<Payment>> GetPayments(){
-        return _dbContext.Payments.ToList();
-    }
+    public ActionResult<List<Payment>> GetPayments([FromQuery] Pagination pagination)
+        => _dbContext.Payments.OrderByDescending(x => x.Id).Skip(pagination.Skip).Take(pagination.Top).ToList();
 }
