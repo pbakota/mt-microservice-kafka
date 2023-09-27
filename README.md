@@ -91,3 +91,32 @@ GET http://127.0.0.1:5050/gateway/items?top=5
 ```
 GET http://127.0.0.1:5050/gateway/deliveries?top=5
 ```
+
+
+#### Deployment with Docker
+
+The directory "docker" contains all the files needed for docker deployment. But before you can do for each service must prepare TAR.GZ archive.
+
+To create TAR.GZ archive for all services from the "source" directory
+`$ make package-all`
+
+The TAR.GZ files can be found in "releases" folder. Please note that the packages contains linux-x64 executables, that means the container where they will be deployed must be a linux container.
+
+To run all microservices with api-gw in one stack execute from "docker" directory
+`make start-stack`
+
+To stop the stack execute from "docker" directory
+`make stop-stack`
+
+After sucessfully deployed system the api gateway is available on  **_http://\<servername or ip\>:5160_**
+
+You can test by adding a new stock item in the db with:
+```
+POST http://<servername or ip>:5160/gateway/items
+Content-Type: application/json
+
+{
+    "Item": "Product 1",
+    "Quantity": 1
+}
+```

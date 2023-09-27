@@ -1,0 +1,37 @@
+@host = http://playbox:5160
+
+### Create order
+POST {{host}}/gateway/orders
+Content-Type: application/json
+
+{
+    "Item": "Product 1",
+    "Quantity": 1,
+    "Amount": 3,
+    "PaymentMethod": "CreditCard",
+    "Address": "address 1"
+}
+
+### Get last 5 order
+GET {{host}}/gateway/orders?top=5
+
+### Get last 5 payment
+GET {{host}}/gateway/payments?top=5
+
+### Add stock item
+POST {{host}}/gateway/items
+Content-Type: application/json
+
+{
+    "Item": "Product 1",
+    "Quantity": 1
+}
+
+### Get stock item
+GET {{host}}/gateway/items/Product%201
+
+### Get top 5 stock items
+GET {{host}}/gateway/items?top=5
+
+### Get last 5 delivery
+GET {{host}}/gateway/deliveries?top=5
