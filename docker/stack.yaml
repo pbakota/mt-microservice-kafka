@@ -6,7 +6,7 @@ services:
     container_name: microservice-orders
     image: microservice-orders:dev
     environment:
-      - Kafka__BootstrapServers=playbox:9094
+      - Kafka__BootstrapServers=${BOOTSTRAP_SERVERS:-localhost:9092}
       - ASPNETCORE_ENVIRONMENT=Release
       - ASPNETCORE_URLS=http://*:5000
     volumes:
@@ -19,7 +19,7 @@ services:
     container_name: microservice-payments
     image: microservice-payments:dev
     environment:
-      - Kafka__BootstrapServers=playbox:9094
+      - Kafka__BootstrapServers=${BOOTSTRAP_SERVERS:-localhost:9092}
       - ASPNETCORE_ENVIRONMENT=Release
       - ASPNETCORE_URLS=http://*:5000
     volumes:
@@ -32,7 +32,7 @@ services:
     container_name: microservice-stock
     image: microservice-stock:dev
     environment:
-      - Kafka__BootstrapServers=playbox:9094
+      - Kafka__BootstrapServers=${BOOTSTRAP_SERVERS:-localhost:9092}
       - ASPNETCORE_ENVIRONMENT=Release
       - ASPNETCORE_URLS=http://*:5000
     volumes:
@@ -45,7 +45,7 @@ services:
     container_name: microservice-delivery
     image: microservice-delivery:dev
     environment:
-      - Kafka__BootstrapServers=playbox:9094
+      - Kafka__BootstrapServers=${BOOTSTRAP_SERVERS:-localhost:9092}
       - ASPNETCORE_ENVIRONMENT=Release
       - ASPNETCORE_URLS=http://*:5000
     volumes:

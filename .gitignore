@@ -5,6 +5,8 @@
 
 docker/**.tgz
 docker/data/*.db
+docker/data/*.db-shm
+docker/data/*.db-wal
 **/db/*.db
 **/db/*.db-shm
 **/db/*.db-wal
