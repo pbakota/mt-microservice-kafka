@@ -3,6 +3,8 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+docker/**.tgz
+docker/data/*.db
 **/db/*.db
 **/db/*.db-shm
 **/db/*.db-wal

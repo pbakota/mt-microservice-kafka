@@ -1,28 +1,45 @@
 # vim: ts=4 sw=4 sts=4 noet ai
-all:
+BOOTSTRAP_SERVERS=Kafka__BootstrapServers=playbox:9094
+
+all: build
 
 build:
 	make build-orders && make build-payments && make build-stock && make build-delivery && make build-gw
 
 build-orders:
-	docker build . --tag=microservice-orders:dev
+	cd orders && docker build --progress=plain --no-cache . --tag=microservice-orders:dev
 
 build-payments:
-	docker build . --tag=microservice-payments:dev
+	cd payments && docker build --progress=plain --no-cache . --tag=microservice-payments:dev
 
 build-stock:
-	docker build . --tag=microservice-stock:dev
+	cd stock && docker build --progress=plain --no-cache . --tag=microservice-stock:dev
 
 build-delivery:
-	docker build . --tag=microservice-delivery:dev
+	cd delivery && docker build --progress=plain --no-cache . --tag=microservice-delivery:dev
 
 build-gw:
-	docker build . --tag=microservice-gw:dev
+	cd gw && docker build --progress=plain --no-cache . --tag=microservice-gw:dev
 
-start-all:
-	docker compose up
+run-orders:
+	docker run --rm --name orders-service -v ./data:/app/db -e $(BOOTSTRAP_SERVERS) -e ASPNETCORE_URLS=http://*:5000 -p 5100:5000 microservice-orders:dev
 
-stop-all:
-	docker compose down
+run-payments:
+	docker run --rm --name payments-service -v ./data:/app/db -e $(BOOTSTRAP_SERVERS) -e ASPNETCORE_URLS=http://*:5000 -p 5101:5000 microservice-payments:dev
+
+run-stock:
+	docker run --rm --name stock-service -v ./data:/app/db -e $(BOOTSTRAP_SERVERS) -e ASPNETCORE_URLS=http://*:5000 -p 5102:5000 microservice-stock:dev
+
+run-delivery:
+	docker run --rm --name delivery-service -v ./data:/app/db -e $(BOOTSTRAP_SERVERS) -e ASPNETCORE_URLS=http://*:5000 -p 5103:5000 microservice-delivery:dev
+
+run-api-gw:
+	docker run --rm --name api-gw-service -v ./config/ocelot.json:/app/ocelot.json:r -p 5160:5050 microservice-api-gw:dev
+
+start-stack:
+	docker compose -f stack.yaml up --remove-orphans -d
+
+stop-stack:
+	docker compose -f stack.yaml down
 
 

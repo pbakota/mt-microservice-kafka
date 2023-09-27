@@ -1,0 +1,91 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/orders",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "microservice-orders",
+          "Port": 5000
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/orders",
+      "UpstreamHttpMethod": [
+        "Post", "Get"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/payments",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "microservice-payments",
+          "Port": 5000
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/payments",
+      "UpstreamHttpMethod": [
+        "Get"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/stock/{product}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "microservice-stock",
+          "Port": 5000
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/items/{product}",
+      "UpstreamHttpMethod": [
+        "Get"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/stock",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "microservice-stock",
+          "Port": 5000
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/items",
+      "UpstreamHttpMethod": [
+        "Post"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/stock",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "microservice-stock",
+          "Port": 5000
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/items",
+      "UpstreamHttpMethod": [
+        "Get"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/deliveries",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "microservice-delivery",
+          "Port": 5000
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/deliveries",
+      "UpstreamHttpMethod": [
+        "Get"
+      ]
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:5050"
+  }
+}

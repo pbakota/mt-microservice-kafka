@@ -1,0 +1,72 @@
+version: '3.7'
+
+services:
+  microservice-orders:
+    restart: unless-stopped
+    container_name: microservice-orders
+    image: microservice-orders:dev
+    environment:
+      - Kafka__BootstrapServers=playbox:9094
+      - ASPNETCORE_ENVIRONMENT=Release
+      - ASPNETCORE_URLS=http://*:5000
+    volumes:
+      - ./data:/app/db
+    ports:
+      - "5100:5000"
+
+  microservice-payments:
+    restart: unless-stopped
+    container_name: microservice-payments
+    image: microservice-payments:dev
+    environment:
+      - Kafka__BootstrapServers=playbox:9094
+      - ASPNETCORE_ENVIRONMENT=Release
+      - ASPNETCORE_URLS=http://*:5000
+    volumes:
+      - ./data:/app/db
+    ports:
+      - "5101:5000"
+
+  microservice-stock:
+    restart: unless-stopped
+    container_name: microservice-stock
+    image: microservice-stock:dev
+    environment:
+      - Kafka__BootstrapServers=playbox:9094
+      - ASPNETCORE_ENVIRONMENT=Release
+      - ASPNETCORE_URLS=http://*:5000
+    volumes:
+      - ./data:/app/db
+    ports:
+      - "5102:5000"
+
+  microservice-delivery:
+    restart: unless-stopped
+    container_name: microservice-delivery
+    image: microservice-delivery:dev
+    environment:
+      - Kafka__BootstrapServers=playbox:9094
+      - ASPNETCORE_ENVIRONMENT=Release
+      - ASPNETCORE_URLS=http://*:5000
+    volumes:
+      - ./data:/app/db
+    ports:
+      - "5103:5000"
+
+  microservice-gw:
+    restart: unless-stopped
+    container_name: microservice-gw
+    image: microservice-gw:dev
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Release
+      - ASPNETCORE_URLS=http://*:5050
+    volumes:
+      - ./config/ocelot.json:/app/ocelot.json:r
+    ports:
+      - "0.0.0.0:5160:5050"
+    depends_on:
+      - microservice-orders
+      - microservice-payments
+      - microservice-stock
+      - microservice-delivery
+
