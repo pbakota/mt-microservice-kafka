@@ -26,3 +26,6 @@ run-delivery:
 update-db-delivery:
 	dotnet ef database update --project Delivery/Delivery.csproj
 
+run-api-gw:
+	dotnet watch run --project ApiGW/ApiGW.csproj
+

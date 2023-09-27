@@ -1,5 +1,5 @@
 ### Create stock item
-POST http://127.0.0.1:5002/addItem
+POST http://127.0.0.1:5002/stock
 Content-Type: application/json
 
 {
@@ -8,4 +8,4 @@ Content-Type: application/json
 }
 
 ### Get stock item
-GET http://127.0.0.1:5002/getItem/Product%201
+GET http://127.0.0.1:5002/stock/Product%201

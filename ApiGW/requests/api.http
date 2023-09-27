@@ -17,7 +17,7 @@ GET http://127.0.0.1:5050/gateway/orders?top=5
 GET http://127.0.0.1:5050/gateway/payments?top=5
 
 ### Add stock item
-POST http://127.0.0.1:5050/gateway/addItem
+POST http://127.0.0.1:5050/gateway/items
 Content-Type: application/json
 
 {
@@ -26,7 +26,10 @@ Content-Type: application/json
 }
 
 ### Get stock item
-GET http://127.0.0.1:5050/gateway/getItem/Product%201
+GET http://127.0.0.1:5050/gateway/items/Product%201
+
+### Get top 5 stock items
+GET http://127.0.0.1:5050/gateway/items?top=5
 
 ### Get last 5 delivery
 GET http://127.0.0.1:5050/gateway/deliveries?top=5

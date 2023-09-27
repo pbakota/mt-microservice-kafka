@@ -1,3 +1,7 @@
+using System.Data.Entity;
+
+using CommonData.Helpers;
+
 using Stock.Models;
 
 namespace Stock.Services;
@@ -5,17 +9,17 @@ namespace Stock.Services;
 public interface IStockService
 {
     Task<StockItem> AddItem(StockItem item);
-    StockItem GetItem(string name);
+    StockItem? GetItem(string name);
+    List<StockItem> GetAll(Pagination pagination);
 }
 
+// NOTE: Unfortunately sqlite3 provider does not support async query operations, therefore the queries are executed synchronously
 public class StockService : IStockService
 {
     private readonly StockDbContext _dbContext;
 
     public StockService(StockDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+        => _dbContext = dbContext;
 
     public async Task<StockItem> AddItem(StockItem item)
     {
@@ -45,9 +49,9 @@ public class StockService : IStockService
         return newStockItem;
     }
 
-    public StockItem GetItem(string name)
-    {
-        var item = _dbContext.StockItems.Where(x => x.Item == name).FirstOrDefault();
-        return item!;
-    }
+    public List<StockItem> GetAll(Pagination pagination)
+        => _dbContext.StockItems.OrderByDescending(x => x.Id).Skip(pagination.Skip).Take(pagination.Top).ToList();
+
+    public StockItem? GetItem(string name)
+        => _dbContext.StockItems.Where(x => x.Item == name).FirstOrDefault();
 }

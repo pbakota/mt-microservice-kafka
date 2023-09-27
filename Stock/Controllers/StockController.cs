@@ -1,3 +1,5 @@
+using CommonData.Helpers;
+
 using Microsoft.AspNetCore.Mvc;
 
 using Stock.Models;
@@ -6,29 +8,24 @@ using Stock.Services;
 namespace Stock.Controllers;
 
 [ApiController]
-[Route("/")]
+[Route("/stock")]
 public class StockController : ControllerBase
 {
-    private readonly ILogger<StockController> _logger;
     private readonly IStockService _service;
 
-    public StockController(ILogger<StockController> logger, IStockService service)
-    {
-        _logger = logger;
-        _service = service;
-    }
+    public StockController(IStockService service)
+        => _service = service;
 
     [HttpPost]
-    [Route("/addItem")]
     public async Task<ActionResult<StockItem>> AddItem(StockItem stockItem)
-    {
-        _logger.LogInformation("Received: {}", stockItem);
-        return Ok(await _service.AddItem(stockItem));
-    }
+        => Ok(await _service.AddItem(stockItem));
 
     [HttpGet]
-    [Route("/getItem/{name}")]
-    public ActionResult<StockItem> GetItem([FromRoute] string name) {
-        return Ok(_service.GetItem(name));
-    }
+    [Route("{name}")]
+    public ActionResult<StockItem> GetItem([FromRoute] string name)
+        => Ok(_service.GetItem(name));
+
+    [HttpGet]
+    public ActionResult<List<StockItem>> GetAll([FromQuery] Pagination pagination)
+        => Ok(_service.GetAll(pagination));
 }

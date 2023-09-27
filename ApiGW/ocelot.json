@@ -29,7 +29,7 @@
       ]
     },
     {
-      "DownstreamPathTemplate": "/getItem/{product}",
+      "DownstreamPathTemplate": "/stock/{product}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -37,13 +37,13 @@
           "Port": 5002
         }
       ],
-      "UpstreamPathTemplate": "/gateway/getItem/{product}",
+      "UpstreamPathTemplate": "/gateway/items/{product}",
       "UpstreamHttpMethod": [
         "Get"
       ]
     },
     {
-      "DownstreamPathTemplate": "/addItem",
+      "DownstreamPathTemplate": "/stock",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -51,9 +51,23 @@
           "Port": 5002
         }
       ],
-      "UpstreamPathTemplate": "/gateway/addItem",
+      "UpstreamPathTemplate": "/gateway/items",
       "UpstreamHttpMethod": [
         "Post"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/stock",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/items",
+      "UpstreamHttpMethod": [
+        "Get"
       ]
     },
     {
