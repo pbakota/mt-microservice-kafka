@@ -1,5 +1,7 @@
+@hostname = http://playbox:5160
+
 ### Create order
-POST http://127.0.0.1:5050/gateway/orders
+POST {{hostname}}/gateway/orders
 Content-Type: application/json
 
 {
@@ -11,13 +13,13 @@ Content-Type: application/json
 }
 
 ### Get last 5 order
-GET http://127.0.0.1:5050/gateway/orders?top=5
+GET {{hostname}}/gateway/orders?top=5
 
 ### Get last 5 payment
-GET http://127.0.0.1:5050/gateway/payments?top=5
+GET {{hostname}}/gateway/payments?top=5
 
 ### Add stock item
-POST http://127.0.0.1:5050/gateway/items
+POST {{hostname}}/gateway/items
 Content-Type: application/json
 
 {
@@ -26,10 +28,10 @@ Content-Type: application/json
 }
 
 ### Get stock item
-GET http://127.0.0.1:5050/gateway/items/Product%201
+GET {{hostname}}/gateway/items/Product%201
 
 ### Get top 5 stock items
-GET http://127.0.0.1:5050/gateway/items?top=5
+GET {{hostname}}/gateway/items?top=5
 
 ### Get last 5 delivery
-GET http://127.0.0.1:5050/gateway/deliveries?top=5
+GET {{hostname}}/gateway/deliveries?top=5

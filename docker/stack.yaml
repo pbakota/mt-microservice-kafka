@@ -11,8 +11,10 @@ services:
       - ASPNETCORE_URLS=http://*:5000
     volumes:
       - ./data:/app/db
-    ports:
-      - "5100:5000"
+    expose:
+      - "5000"
+    networks:
+      - csharp-microservices
 
   microservice-payments:
     restart: unless-stopped
@@ -24,8 +26,10 @@ services:
       - ASPNETCORE_URLS=http://*:5000
     volumes:
       - ./data:/app/db
-    ports:
-      - "5101:5000"
+    expose:
+      - "5000"
+    networks:
+      - csharp-microservices
 
   microservice-stock:
     restart: unless-stopped
@@ -37,8 +41,10 @@ services:
       - ASPNETCORE_URLS=http://*:5000
     volumes:
       - ./data:/app/db
-    ports:
-      - "5102:5000"
+    expose:
+      - "5000"
+    networks:
+      - csharp-microservices
 
   microservice-delivery:
     restart: unless-stopped
@@ -50,8 +56,10 @@ services:
       - ASPNETCORE_URLS=http://*:5000
     volumes:
       - ./data:/app/db
-    ports:
-      - "5103:5000"
+    expose:
+      - "5000"
+    networks:
+      - csharp-microservices
 
   microservice-gw:
     restart: unless-stopped
@@ -64,9 +72,16 @@ services:
       - ./config/ocelot.json:/app/ocelot.json:r
     ports:
       - "0.0.0.0:5160:5050"
+    networks:
+      - csharp-microservices
     depends_on:
       - microservice-orders
       - microservice-payments
       - microservice-stock
       - microservice-delivery
+
+networks:
+  csharp-microservices:
+    ipam:
+      driver: default
 
