@@ -129,3 +129,8 @@ Content-Type: application/json
 
 **IMPORTANT: The stack does not contain the Kafka service, which must be already available. The address of the bootstrap server must be specified in the "BOOTSTRAP_SERVERS" environment variable**
 e.g: `export BOOTSTRAP_SERVERS=localhost:9092`
+
+
+## Footnotes
+
+A similar project is available for Java Spring Boot 3 https://github.com/pbakota/java-microservice-kafka
